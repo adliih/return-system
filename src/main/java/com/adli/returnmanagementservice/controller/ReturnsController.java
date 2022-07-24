@@ -3,6 +3,7 @@ package com.adli.returnmanagementservice.controller;
 import com.adli.returnmanagementservice.entity.returns.Returns;
 import com.adli.returnmanagementservice.repository.returns.ReturnsRepository;
 import com.adli.returnmanagementservice.request.returns.CreateReturnRequest;
+import com.adli.returnmanagementservice.response.returns.ReturnItemResponse;
 import com.adli.returnmanagementservice.response.returns.ReturnsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +20,6 @@ public class ReturnsController {
     public ReturnsResponse getReturnDetail(@PathVariable int id) {
         Returns returns = returnsRepository.findById(id).orElseThrow();
 
-        return ReturnsResponse.builder()
-                .id(returns.getId())
-                .status(returns.getStatus())
-                .refundAmount(returns.getRefundAmount())
-                .build();
+        return ReturnsResponse.of(returns).build();
     }
 }

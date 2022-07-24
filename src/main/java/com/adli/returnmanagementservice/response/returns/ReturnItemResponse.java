@@ -6,5 +6,6 @@ import lombok.Builder;
 public class ReturnItemResponse {
     private int id;
     private String sku;
+    private int quantity;
 
 }
