@@ -86,7 +86,7 @@ public class ReturnManagementServiceApplication {
 				itemsRepository.save(Items.builder()
 						.sku(productId)
 						.price(price)
-						.orderId(order.getId())
+						.order(order)
 						.quantity(Integer.parseInt(row.get("quantity")))
 						.build());
 			}

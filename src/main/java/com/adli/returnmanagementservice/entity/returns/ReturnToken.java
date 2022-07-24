@@ -1,13 +1,13 @@
 package com.adli.returnmanagementservice.entity.returns;
 
+import com.adli.returnmanagementservice.entity.order.Orders;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -22,5 +22,16 @@ public class ReturnToken {
 
     private String token;
 
-    private String orderId;
+//    @Column(name = "order_id")
+//    private String orderId;
+
+    // relationships
+
+    @ManyToOne(targetEntity = Orders.class)
+    private Orders order;
+
+    @OneToOne(targetEntity = Returns.class)
+    private Returns returns;
+
+    // ./relationships
 }

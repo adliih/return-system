@@ -1,10 +1,9 @@
 package com.adli.returnmanagementservice.entity.returns;
 
+import com.adli.returnmanagementservice.entity.order.Items;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -18,12 +17,24 @@ public class ReturnItems {
     @GeneratedValue
     private int id;
 
-    private int returnId;
+//    @Column(name = "return_id")
+//    private int returnId;
 
-    private int orderItemId;
+//    @Column(name = "order_item_id")
+//    private int orderItemId;
 
     private int quantity;
 
     @Builder.Default()
     private ReturnItemsQcStatus status = ReturnItemsQcStatus.WAITING;
+
+    // relationships
+
+    @ManyToOne(targetEntity = Returns.class, optional = false)
+    private Returns returns;
+
+    @ManyToOne(targetEntity = Items.class, optional = false)
+    private Items orderItem;
+
+    // ./relationships
 }

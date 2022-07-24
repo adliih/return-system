@@ -2,9 +2,8 @@ package com.adli.returnmanagementservice.entity.returns;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,12 +17,23 @@ public class Returns {
     @GeneratedValue
     private int id;
 
-    private int tokenId;
+//    @Column(name = "token_id")
+//    private int tokenId;
 
     @Builder.Default()
-    private long refundAmount = 0;
+//    @Column(name = "refund_amount")
+    private double refundAmount = 0;
 
     @Builder.Default()
     private ReturnStatus status = ReturnStatus.AWAITING_APPROVAL;
 
+    // relationships
+
+    @OneToMany(targetEntity = ReturnItems.class, mappedBy = "returns")
+    private List<ReturnItems> items;
+
+    @OneToOne(targetEntity = ReturnToken.class)
+    private ReturnToken token;
+
+    // ./relationships
 }
