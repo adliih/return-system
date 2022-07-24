@@ -23,7 +23,7 @@ public class ReturnTokenService {
         String token = this.generateUniqueToken(order.getId());
         return repository.save(ReturnToken.builder()
                 .token(token)
-                .orderId(order.getId())
+                .order(order)
                 .build());
     }
 
