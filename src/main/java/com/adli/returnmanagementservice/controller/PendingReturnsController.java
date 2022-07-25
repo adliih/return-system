@@ -7,11 +7,13 @@ import com.adli.returnmanagementservice.request.returns.PendingReturnCreationReq
 import com.adli.returnmanagementservice.response.returns.PendingReturnResponse;
 import com.adli.returnmanagementservice.service.returns.ReturnTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 public class PendingReturnsController {
@@ -19,7 +21,7 @@ public class PendingReturnsController {
     @Autowired ReturnTokenService returnTokenService;
 
     @PostMapping("/pending/returns")
-    public PendingReturnResponse postPendingRequest(
+    public ResponseEntity<PendingReturnResponse> postPendingRequest(
             @RequestBody PendingReturnCreationRequest request
     ) {
 
@@ -29,10 +31,11 @@ public class PendingReturnsController {
 
         ReturnToken token = returnTokenService.issueTokenForOrder(order);
 
-        return PendingReturnResponse.builder()
+        PendingReturnResponse response = PendingReturnResponse.builder()
                 .token(token.getToken())
                 .orderId(request.getOrderId())
                 .email(request.getEmail())
                 .build();
+        return ResponseEntity.of(Optional.of(response));
     }
 }

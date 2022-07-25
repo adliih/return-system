@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,21 +42,23 @@ public class ReturnsController {
     ReturnService returnService;
 
     @GetMapping("/returns/{id}")
-    public ReturnsResponse getReturnDetail(@PathVariable int id) {
+    public ResponseEntity<ReturnsResponse> getReturnDetail(@PathVariable int id) {
         Returns returns = returnsRepository.findById(id).orElseThrow();
 
-        return ReturnsResponse.of(returns).build();
+        ReturnsResponse response = ReturnsResponse.of(returns).build();
+
+        return ResponseEntity.of(Optional.of(response));
     }
 
     @PostMapping("/returns")
-    public Object createReturn(@RequestBody CreateReturnRequest request) {
+    public ResponseEntity<ReturnsResponse> createReturn(@RequestBody CreateReturnRequest request) {
         // validation check token valid or not (no invalid token)
         ReturnToken returnToken = returnTokenRepository.findByToken(request.getToken()).orElseThrow();
 
         // token should not be used previously
         if (null != returnToken.getReturns()) {
             // token already used, bad request.
-            return ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
 
         Orders order = returnToken.getOrder();
@@ -77,7 +80,7 @@ public class ReturnsController {
         if (!existingReturnedOrderItemIds.isEmpty()) {
             // there are already returned order item
             // reject the request
-            return ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
 
         // construct the return items request
@@ -94,9 +97,11 @@ public class ReturnsController {
 
         Returns returns = returnService.createReturn(returnToken, order, returnItems);
 
-        return ReturnsResponse.of(returns)
+        ReturnsResponse response = ReturnsResponse.of(returns)
                 // Use estimated refund amount when initial creating returns data
                 .refundAmount(returnService.calculateEstimatedRefundAmount(returns))
                 .build();
+
+        return ResponseEntity.of(Optional.of(response));
     }
 }

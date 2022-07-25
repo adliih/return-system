@@ -30,7 +30,7 @@ public class ReturnItemController {
     ReturnService returnService;
 
     @PutMapping("/returns/{id}/items/{itemId}/qc/status")
-    public Object updateItemStatus(
+    public ResponseEntity<ReturnItemResponse> updateItemStatus(
             @PathVariable("id") int id,
             @PathVariable("itemId") int itemId,
             @RequestBody UpdateReturnItemQcStatusRequest request
@@ -50,6 +50,6 @@ public class ReturnItemController {
         returnService.recalculateStatus(returns);
         returnService.recalculateRefundAmount(returns);
 
-        return ReturnItemResponse.of(returnItem).build();
+        return ResponseEntity.of(Optional.of(ReturnItemResponse.of(returnItem).build()));
     }
 }
