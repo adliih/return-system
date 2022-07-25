@@ -42,10 +42,11 @@ public class ReturnService {
                 .token(returnToken)
                 .build());
 
-        returns.setItems(items);
         items.forEach(returnItems -> returnItems.setReturns(returns));
 
         returnItemsRepository.saveAll(items);
+
+        returns.setItems(items);
 
         return returns;
     }
@@ -53,7 +54,7 @@ public class ReturnService {
     public double calculateEstimatedRefundAmount(Returns returns) {
         return returns.getItems().stream()
                 // calculate the refund amount for all item regardless it's accepted or not
-                .mapToDouble((item) -> item.getOrderItem().getPrice())
+                .mapToDouble((item) -> item.getOrderItem().getPrice() * item.getQuantity())
                 .sum();
     }
 
@@ -61,7 +62,7 @@ public class ReturnService {
         double refundAmount = returns.getItems().stream()
                 // Only calculate the item with approved status
                 .filter((item) -> item.getStatus() == ReturnItemsQcStatus.APPROVED)
-                .mapToDouble((item) -> item.getOrderItem().getPrice())
+                .mapToDouble((item) -> item.getOrderItem().getPrice() * item.getQuantity())
                 .sum();
 
         returns.setRefundAmount(refundAmount);

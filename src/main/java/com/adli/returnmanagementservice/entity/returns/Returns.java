@@ -31,6 +31,7 @@ public class Returns {
     // relationships
 
     @OneToMany(targetEntity = ReturnItems.class, mappedBy = "returns")
+    @Singular
     private Set<ReturnItems> items;
 
     @OneToOne(targetEntity = ReturnToken.class)

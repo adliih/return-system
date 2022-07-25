@@ -21,6 +21,7 @@ public class Orders {
     // relationships
 
     @OneToMany(targetEntity = Items.class, cascade = CascadeType.ALL, mappedBy = "order")
+    @Singular
     private Set<Items> items;
 
     // ./relationships
