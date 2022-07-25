@@ -22,9 +22,6 @@ public class ReturnToken {
 
     private String token;
 
-//    @Column(name = "order_id")
-//    private String orderId;
-
     // relationships
 
     @ManyToOne(targetEntity = Orders.class)

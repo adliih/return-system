@@ -8,6 +8,7 @@ import com.adli.returnmanagementservice.response.returns.PendingReturnResponse;
 import com.adli.returnmanagementservice.service.returns.ReturnTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
@@ -19,7 +20,7 @@ public class PendingReturnsController {
 
     @PostMapping("/pending/returns")
     public PendingReturnResponse postPendingRequest(
-            PendingReturnCreationRequest request
+            @RequestBody PendingReturnCreationRequest request
     ) {
 
         Orders order = ordersRepository

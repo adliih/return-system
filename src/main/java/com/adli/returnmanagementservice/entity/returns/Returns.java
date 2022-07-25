@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -30,7 +31,7 @@ public class Returns {
     // relationships
 
     @OneToMany(targetEntity = ReturnItems.class, mappedBy = "returns")
-    private List<ReturnItems> items;
+    private Set<ReturnItems> items;
 
     @OneToOne(targetEntity = ReturnToken.class)
     private ReturnToken token;

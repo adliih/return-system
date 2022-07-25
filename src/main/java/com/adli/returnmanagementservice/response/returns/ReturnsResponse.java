@@ -3,11 +3,13 @@ package com.adli.returnmanagementservice.response.returns;
 import com.adli.returnmanagementservice.entity.returns.ReturnStatus;
 import com.adli.returnmanagementservice.entity.returns.Returns;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Singular;
 
 import java.util.List;
 
 @Builder
+@Getter
 public class ReturnsResponse {
 
     private int id;
@@ -22,11 +24,7 @@ public class ReturnsResponse {
                 .status(returns.getStatus())
                 .refundAmount(returns.getRefundAmount())
                 .items(returns.getItems().stream().map((item) -> {
-                    return ReturnItemResponse.builder()
-                            .id(item.getId())
-                            .sku(item.getOrderItem().getSku())
-                            .quantity(item.getQuantity())
-                            .build();
+                    return ReturnItemResponse.of(item).build();
                 }).toList());
     }
 }

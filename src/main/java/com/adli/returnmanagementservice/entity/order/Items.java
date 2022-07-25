@@ -1,5 +1,6 @@
 package com.adli.returnmanagementservice.entity.order;
 
+import com.adli.returnmanagementservice.entity.returns.ReturnItems;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,4 +23,7 @@ public class Items {
 
     @ManyToOne(targetEntity = Orders.class, optional = false)
     private Orders order;
+
+    @OneToOne(targetEntity = ReturnItems.class)
+    private ReturnItems returnItem;
 }

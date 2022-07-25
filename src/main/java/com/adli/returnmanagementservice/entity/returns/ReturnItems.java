@@ -20,9 +20,6 @@ public class ReturnItems {
 //    @Column(name = "return_id")
 //    private int returnId;
 
-//    @Column(name = "order_item_id")
-//    private int orderItemId;
-
     private int quantity;
 
     @Builder.Default()
