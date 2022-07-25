@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class ReturnsController {
     ReturnService returnService;
 
     @GetMapping("/returns/{id}")
+    @Transactional
     public ResponseEntity<ReturnsResponse> getReturnDetail(@PathVariable int id) {
         Returns returns = returnsRepository.findById(id).orElseThrow();
 
@@ -66,18 +68,37 @@ public class ReturnsController {
         // since the request use SKU but in data level we use order item id,
         // we need to convert the sku -> item order id
         // the service itself will also validate the sku value (the order should contain sku requested)
-        Map<String, Integer> orderItemIdMap = returnService.convertsSkuToOrderItemIdOfOrder(
+        Map<String, Items> orderItemMap = returnService.convertsSkuToOrderItemOfOrder(
                 order,
                 request.getItems().stream()
                         .map(CreateReturnItemRequest::getSku)
                         .collect(Collectors.toSet())
         );
 
+        if (request.getItems().size() != orderItemMap.size()) {
+            // some of sku is not found
+            return ResponseEntity.unprocessableEntity().build();
+        }
+
+        // Validation to check quantity is not exceeding the ordered quantity
+        boolean isInvalidQuantityRequested = request.getItems().stream()
+                .anyMatch(createReturnItemRequest -> {
+                    int requestedQuantity = createReturnItemRequest.getQuantity();
+                    int orderedQuantity = orderItemMap.get(createReturnItemRequest.getSku()).getQuantity();
+                    return requestedQuantity > orderedQuantity;
+                });
+
+        if (isInvalidQuantityRequested) {
+            return ResponseEntity.badRequest().build();
+        }
+
         // validation check orderId-sku already returned or not (no double return)
-        List<ReturnItems> existingReturnedOrderItemIds = returnItemsRepository.findAllByOrderItemId(
-                orderItemIdMap.values()
+        List<ReturnItems> existingReturnedOrderItems = returnItemsRepository.findAllByOrderItemId(
+                orderItemMap.values().stream()
+                .map(Items::getId)
+                .toList()
         );
-        if (!existingReturnedOrderItemIds.isEmpty()) {
+        if (!existingReturnedOrderItems.isEmpty()) {
             // there are already returned order item
             // reject the request
             return ResponseEntity.badRequest().build();
@@ -86,8 +107,7 @@ public class ReturnsController {
         // construct the return items request
         Set<ReturnItems> returnItems = request.getItems().stream()
                 .map(createReturnItemRequest -> {
-                    Integer orderItemId = orderItemIdMap.get(createReturnItemRequest.getSku());
-                    Items orderItem = Items.builder().id(orderItemId).build();
+                    Items orderItem = orderItemMap.get(createReturnItemRequest.getSku());
                     return ReturnItems.builder()
                             .quantity(createReturnItemRequest.getQuantity())
                             .orderItem(orderItem)
@@ -95,7 +115,7 @@ public class ReturnsController {
                 }).collect(Collectors.toSet());
 
 
-        Returns returns = returnService.createReturn(returnToken, order, returnItems);
+        Returns returns = returnService.createReturn(returnToken, returnItems);
 
         ReturnsResponse response = ReturnsResponse.of(returns)
                 // Use estimated refund amount when initial creating returns data

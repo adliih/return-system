@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +86,7 @@ class ReturnServiceTest {
                         .status(ReturnItemsQcStatus.APPROVED)
                         .build())
                 .item(ReturnItems.builder()
-                        .status(ReturnItemsQcStatus.APPROVED)
+                        .status(ReturnItemsQcStatus.REJECTED)
                         .build())
                 .build();
         returnService.recalculateStatus(returns);
@@ -105,11 +104,11 @@ class ReturnServiceTest {
         Set<String> listOfSku = new HashSet<>();
         listOfSku.add("SKU-1");
         listOfSku.add("SKU-3");
-        Map<String, Integer> orderItemMap = returnService.convertsSkuToOrderItemIdOfOrder(order, listOfSku);
+        Map<String, Items> orderItemMap = returnService.convertsSkuToOrderItemOfOrder(order, listOfSku);
 
         assertNull(orderItemMap.get("SKU-2"));
-        assertEquals(1, orderItemMap.get("SKU-1"));
-        assertEquals(3, orderItemMap.get("SKU-3"));
+        assertEquals(1, orderItemMap.get("SKU-1").getId());
+        assertEquals(3, orderItemMap.get("SKU-3").getId());
     }
 
     @Test
@@ -121,7 +120,7 @@ class ReturnServiceTest {
         ordersRepository.save(order);
 
         Set<ReturnItems> returnItems = new HashSet<>();
-        Returns returns = returnService.createReturn(returnToken, order, returnItems);
+        Returns returns = returnService.createReturn(returnToken, returnItems);
 
         assertNotNull(returns);
     }

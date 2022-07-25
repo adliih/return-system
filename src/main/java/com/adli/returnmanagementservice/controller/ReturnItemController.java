@@ -49,6 +49,7 @@ public class ReturnItemController {
 
         returnService.recalculateStatus(returns);
         returnService.recalculateRefundAmount(returns);
+        returnsRepository.save(returns);
 
         return ResponseEntity.of(Optional.of(ReturnItemResponse.of(returnItem).build()));
     }

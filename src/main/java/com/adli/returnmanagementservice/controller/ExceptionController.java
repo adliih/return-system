@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 public class ExceptionController {
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity resourceNotFoundException(NoSuchElementException e) {
+    public ResponseEntity<Object> exception(NoSuchElementException e) {
         return ResponseEntity.notFound().build();
     }
 }

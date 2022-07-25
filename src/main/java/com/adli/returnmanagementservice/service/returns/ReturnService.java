@@ -8,7 +8,6 @@ import com.adli.returnmanagementservice.repository.returns.ReturnsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,21 +21,15 @@ public class ReturnService {
     @Autowired
     ReturnItemsRepository returnItemsRepository;
 
-    public Map<String, Integer> convertsSkuToOrderItemIdOfOrder(Orders order, Set<String> listOfSku) {
-        Map<String, Integer> orderItemMap = order.getItems().stream()
+    public Map<String, Items> convertsSkuToOrderItemOfOrder(Orders order, Set<String> listOfSku) {
+        Map<String, Items> orderItemMap = order.getItems().stream()
                 .filter(items -> listOfSku.contains(items.getSku()))
-                .collect(Collectors.toMap(Items::getSku, Items::getId));
-
-        if (listOfSku.size() != orderItemMap.size()) {
-            // some of the sku is not found
-            throw new IllegalArgumentException("Some of the SKU supplied is not found");
-        }
+                .collect(Collectors.toMap(Items::getSku, items -> items));
 
         return orderItemMap;
     }
 
-    @Transactional
-    public Returns createReturn(ReturnToken returnToken, Orders order, Set<ReturnItems> items) {
+    public Returns createReturn(ReturnToken returnToken, Set<ReturnItems> items) {
 
         Returns returns = returnsRepository.save(Returns.builder()
                 .token(returnToken)
@@ -70,8 +63,8 @@ public class ReturnService {
 
     public void recalculateStatus(Returns returns) {
         boolean isComplete = returns.getItems().stream()
-                // remove the approved item, if it's all gone, then all the items are approved
-                .noneMatch((item) -> item.getStatus() != ReturnItemsQcStatus.APPROVED);
+                // remove the approved item, if it's all gone, then all the items are not waiting anymore
+                .noneMatch((item) -> item.getStatus() == ReturnItemsQcStatus.WAITING);
 
         if (!isComplete) {
             return;

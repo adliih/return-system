@@ -18,11 +18,7 @@ public class Returns {
     @GeneratedValue
     private int id;
 
-//    @Column(name = "token_id")
-//    private int tokenId;
-
     @Builder.Default()
-//    @Column(name = "refund_amount")
     private double refundAmount = 0;
 
     @Builder.Default()
